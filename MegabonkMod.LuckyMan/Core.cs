@@ -11,36 +11,35 @@ using System.Runtime.CompilerServices;
 [assembly: CompilationRelaxations(8)]
 [assembly: RuntimeCompatibility(WrapNonExceptionThrows = true)]
 [assembly: Debuggable(DebuggableAttribute.DebuggingModes.Default | DebuggableAttribute.DebuggingModes.DisableOptimizations | DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints | DebuggableAttribute.DebuggingModes.EnableEditAndContinue)]
-[assembly: MelonInfo(typeof(Core), "LuckyMan", "1.0.1", "Slimaeus", null)]
+[assembly: MelonInfo(typeof(Core), "LuckyMan", "1.0.2", "Slimaeus", null)]
 [assembly: MelonGame("Ved", "Megabonk")]
 namespace MegabonkMod.LuckyMan;
 
 public class Core : MelonMod
 {
     private const string _startScenceName = "GeneratedMap";
-    private const int _luckAmount = 100000;
+    private const int _luckAmount = 100;
     private const int _remainLevels = 98;
     public override void OnSceneWasLoaded(int buildIndex, string sceneName)
     {
-        if (sceneName == _startScenceName)
+        if (sceneName != _startScenceName)
+            return;
+        var luckTome = DataManager.Instance.tomeData[ETome.Luck];
+        var luckTomeModifiers = new Il2CppSystem.Collections.Generic.List<StatModifier>();
+        luckTomeModifiers.Add(new StatModifier
         {
-            var luckTome = DataManager.Instance.tomeData[ETome.Luck];
-            var luckTomeModifiers = new Il2CppSystem.Collections.Generic.List<StatModifier>();
-            luckTomeModifiers.Add(new StatModifier
-            {
-                stat = EStat.Luck,
-                modification = _luckAmount,
-                modifyType = EStatModifyType.Addition
-            });
+            stat = EStat.Luck,
+            modification = _luckAmount,
+            modifyType = EStatModifyType.Flat
+        });
 
-            GameManager.Instance.player.inventory.tomeInventory.AddTome(luckTome, luckTomeModifiers, ERarity.New);
-            for (int i = 0; i < _remainLevels; i++)
-            {
-                GameManager.Instance.player.inventory.tomeInventory.AddTome(luckTome, luckTomeModifiers, ERarity.Legendary);
-            }
-
-            LoggerInstance.Msg("Now you are lucky!");
+        GameManager.Instance.player.inventory.tomeInventory.AddTome(luckTome, luckTomeModifiers, ERarity.New);
+        for (int i = 0; i < _remainLevels; i++)
+        {
+            GameManager.Instance.player.inventory.tomeInventory.AddTome(luckTome, luckTomeModifiers, ERarity.Legendary);
         }
+
+        LoggerInstance.Msg("Now you are lucky!");
     }
     public override void OnInitializeMelon()
     {
