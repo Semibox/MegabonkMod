@@ -11,13 +11,15 @@ using System.Runtime.CompilerServices;
 [assembly: CompilationRelaxations(8)]
 [assembly: RuntimeCompatibility(WrapNonExceptionThrows = true)]
 [assembly: Debuggable(DebuggableAttribute.DebuggingModes.Default | DebuggableAttribute.DebuggingModes.DisableOptimizations | DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints | DebuggableAttribute.DebuggingModes.EnableEditAndContinue)]
-[assembly: MelonInfo(typeof(Core), "LuckyMan", "1.0.0", "Slimaeus", null)]
+[assembly: MelonInfo(typeof(Core), "LuckyMan", "1.0.1", "Slimaeus", null)]
 [assembly: MelonGame("Ved", "Megabonk")]
 namespace MegabonkMod.LuckyMan;
 
 public class Core : MelonMod
 {
     private const string _startScenceName = "GeneratedMap";
+    private const int _luckAmount = 100000;
+    private const int _remainLevels = 98;
     public override void OnSceneWasLoaded(int buildIndex, string sceneName)
     {
         if (sceneName == _startScenceName)
@@ -27,12 +29,12 @@ public class Core : MelonMod
             luckTomeModifiers.Add(new StatModifier
             {
                 stat = EStat.Luck,
-                modification = 100000,
+                modification = _luckAmount,
                 modifyType = EStatModifyType.Addition
             });
 
             GameManager.Instance.player.inventory.tomeInventory.AddTome(luckTome, luckTomeModifiers, ERarity.New);
-            for (int i = 0; i < 98; i++)
+            for (int i = 0; i < _remainLevels; i++)
             {
                 GameManager.Instance.player.inventory.tomeInventory.AddTome(luckTome, luckTomeModifiers, ERarity.Legendary);
             }
