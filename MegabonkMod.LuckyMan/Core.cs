@@ -1,17 +1,14 @@
-﻿using Il2Cpp;
+﻿using System.Collections;
+using Il2Cpp;
 using Il2CppAssets.Scripts._Data.Tomes;
 using Il2CppAssets.Scripts.Inventory__Items__Pickups;
 using Il2CppAssets.Scripts.Inventory__Items__Pickups.Stats;
 using Il2CppAssets.Scripts.Menu.Shop;
 using MegabonkMod.LuckyMan;
 using MelonLoader;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
+using UnityEngine;
 
-[assembly: CompilationRelaxations(8)]
-[assembly: RuntimeCompatibility(WrapNonExceptionThrows = true)]
-[assembly: Debuggable(DebuggableAttribute.DebuggingModes.Default | DebuggableAttribute.DebuggingModes.DisableOptimizations | DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints | DebuggableAttribute.DebuggingModes.EnableEditAndContinue)]
-[assembly: MelonInfo(typeof(Core), "LuckyMan", "1.0.3", "Slimaeus", null)]
+[assembly: MelonInfo(typeof(Core), "LuckyMan", "1.0.4", "Slimaeus", null)]
 [assembly: MelonGame("Ved", "Megabonk")]
 namespace MegabonkMod.LuckyMan;
 
@@ -19,11 +16,28 @@ public class Core : MelonMod
 {
     private const string _startScenceName = "GeneratedMap";
     private const int _luckAmount = 100;
-    private const int _remainLevels = 98;
+    private const int _remainLevels = 98; 
     public override void OnSceneWasInitialized(int buildIndex, string sceneName)
     {
-        if (sceneName != _startScenceName)
-            return;
+        if (sceneName == _startScenceName)
+        {
+            MelonCoroutines.Start(WaitAndAddTomes());
+        }
+    }
+
+    private IEnumerator WaitAndAddTomes()
+    {
+        while (GameManager.Instance?.player?.inventory?.tomeInventory == null)
+        {
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        AddTomesToPlayer();
+    }
+    private void AddTomesToPlayer()
+    {
         var luckTome = DataManager.Instance.tomeData[ETome.Luck];
         var luckTomeModifiers = new Il2CppSystem.Collections.Generic.List<StatModifier>();
         luckTomeModifiers.Add(new StatModifier
@@ -40,9 +54,5 @@ public class Core : MelonMod
         }
 
         LoggerInstance.Msg("Now you are lucky!");
-    }
-    public override void OnInitializeMelon()
-    {
-        LoggerInstance.Msg("Initialized.");
     }
 }
