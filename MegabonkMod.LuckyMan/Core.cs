@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 [assembly: CompilationRelaxations(8)]
 [assembly: RuntimeCompatibility(WrapNonExceptionThrows = true)]
 [assembly: Debuggable(DebuggableAttribute.DebuggingModes.Default | DebuggableAttribute.DebuggingModes.DisableOptimizations | DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints | DebuggableAttribute.DebuggingModes.EnableEditAndContinue)]
-[assembly: MelonInfo(typeof(Core), "LuckyMan", "1.0.2", "Slimaeus", null)]
+[assembly: MelonInfo(typeof(Core), "LuckyMan", "1.0.3", "Slimaeus", null)]
 [assembly: MelonGame("Ved", "Megabonk")]
 namespace MegabonkMod.LuckyMan;
 
@@ -20,7 +20,7 @@ public class Core : MelonMod
     private const string _startScenceName = "GeneratedMap";
     private const int _luckAmount = 100;
     private const int _remainLevels = 98;
-    public override void OnSceneWasLoaded(int buildIndex, string sceneName)
+    public override void OnSceneWasInitialized(int buildIndex, string sceneName)
     {
         if (sceneName != _startScenceName)
             return;
