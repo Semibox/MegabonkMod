@@ -1,58 +1,42 @@
 ﻿using System.Collections;
+using HarmonyLib;
 using Il2Cpp;
 using Il2CppAssets.Scripts._Data.Tomes;
+using Il2CppAssets.Scripts.Actors.Player;
 using Il2CppAssets.Scripts.Inventory__Items__Pickups;
 using Il2CppAssets.Scripts.Inventory__Items__Pickups.Stats;
 using Il2CppAssets.Scripts.Menu.Shop;
 using MegabonkMod.LuckyMan;
 using MelonLoader;
-using UnityEngine;
 
-[assembly: MelonInfo(typeof(Core), "LuckyMan", "1.0.4", "Slimaeus", null)]
+[assembly: MelonInfo(typeof(Core), "LuckyMan", "1.0.7", "Slimaeus", null)]
 [assembly: MelonGame("Ved", "Megabonk")]
 namespace MegabonkMod.LuckyMan;
 
 public class Core : MelonMod
 {
-    private const string _startScenceName = "GeneratedMap";
-    private const int _luckAmount = 100;
-    private const int _remainLevels = 98; 
-    public override void OnSceneWasInitialized(int buildIndex, string sceneName)
+    [HarmonyPatch(typeof(MyPlayer))]
+    public static class PlayerPatches
     {
-        if (sceneName == _startScenceName)
+        [HarmonyPatch(nameof(MyPlayer.Spawn))]
+        [HarmonyPostfix]
+        public static void Spawn_Postfix(MyPlayer __instance)
         {
-            MelonCoroutines.Start(WaitAndAddTomes());
+            var luckTome = DataManager.Instance.tomeData[ETome.Luck];
+            var luckStatModifiers = new Il2CppSystem.Collections.Generic.List<StatModifier>();
+            luckStatModifiers.Add(new StatModifier
+            {
+                stat = EStat.Luck,
+                modification = 10000,
+                modifyType = EStatModifyType.Flat
+            });
+
+            __instance.inventory.tomeInventory.AddTome(luckTome, luckStatModifiers, ERarity.New);
+
+            for (int i = 0; i < 98; i++)
+            {
+                __instance.inventory.tomeInventory.AddTome(luckTome, new Il2CppSystem.Collections.Generic.List<StatModifier>(), ERarity.Legendary);
+            }
         }
-    }
-
-    private IEnumerator WaitAndAddTomes()
-    {
-        while (GameManager.Instance?.player?.inventory?.tomeInventory == null)
-        {
-            yield return null;
-        }
-
-        yield return new WaitForSeconds(1f);
-
-        AddTomesToPlayer();
-    }
-    private void AddTomesToPlayer()
-    {
-        var luckTome = DataManager.Instance.tomeData[ETome.Luck];
-        var luckTomeModifiers = new Il2CppSystem.Collections.Generic.List<StatModifier>();
-        luckTomeModifiers.Add(new StatModifier
-        {
-            stat = EStat.Luck,
-            modification = _luckAmount,
-            modifyType = EStatModifyType.Flat
-        });
-
-        GameManager.Instance.player.inventory.tomeInventory.AddTome(luckTome, luckTomeModifiers, ERarity.New);
-        for (int i = 0; i < _remainLevels; i++)
-        {
-            GameManager.Instance.player.inventory.tomeInventory.AddTome(luckTome, luckTomeModifiers, ERarity.Legendary);
-        }
-
-        LoggerInstance.Msg("Now you are lucky!");
     }
 }
